@@ -1,18 +1,9 @@
-var freedom = require('freedom-for-node').freedom;
 var http = require('http');
 var url = require('url');
-
-var pool = [];
-var users = {};
-
-var fillPool = function(level) {
-  while(pool.length < level) {
-    pool.push(freedom('user/user.json'));
-  }
-};
+var pool = require('./pool');
 
 var push = function(toHowMany, resp) {
-  var user = freedom('user/user.json');
+  var user = pool.get(Math.random());
   user.on('result', function(result) {
     resp.end(result);
   });
@@ -23,7 +14,7 @@ http.createServer(function(req, resp) {
   resp.writeHead(200, {'Content-Type': 'text/html'});
   var queryData = url.parse(req.url, true).query;
   if (queryData.pool) {
-    fillPool(queryData.pool);
+    pool.fillPool(queryData.pool);
     resp.end("filled to " + queryData.pool);
   } else if (queryData.push) {
     push(queryData.push, resp);

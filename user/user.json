@@ -1,0 +1,9 @@
+{
+  "name": "user",
+  "app": {
+    "script": "user.js"
+  },
+  "permissions": [
+    "core.view"
+  ]
+}

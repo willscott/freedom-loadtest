@@ -1,0 +1,9 @@
+{
+  "name": "social",
+  "app": {
+    "script": "social.json"
+  },
+  "provides": [
+    "social"
+  ]
+}

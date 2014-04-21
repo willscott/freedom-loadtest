@@ -1,0 +1,24 @@
+{
+  "name": "freedom-loadtest",
+  "description": "loadtest social message server for freedom.js",
+  "version": "0.0.1",
+  "homepage": "http://freedomjs.org",
+  "bugs": {
+    "url": "http://github.com/willscott/freedom-loadtest/issues",
+    "email": "wrs@cs.washington.edu"
+  },
+  "contributors": [
+    "Will Scott <willscott@gmail.com> (https://wills.co.tt/)",
+    "Raymond Cheng <ryscheng@cs.washington.edu>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/willscott/freedom-loadtest"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "dependencies": {
+    "freedom-for-node": "~0.0.3",
+    "nedb": "~0.10.5"
+  }
+}

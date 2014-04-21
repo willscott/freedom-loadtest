@@ -3,7 +3,14 @@
   "app": {
     "script": "user.js"
   },
-  "permissions": [
-    "core.view"
-  ]
+  "dependencies": {
+    "social": {
+      "url": "../social/social.json",
+      "api": "social"
+    },
+    "storage": {
+      "url": "../storage/storage.json",
+      "api": "storage"
+    }
+  }
 }

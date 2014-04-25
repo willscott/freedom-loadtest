@@ -10,8 +10,11 @@ Pool.prototype.setup = function(id, continuation) {
   var base = this.caller.manifestId;
   fdom.resources.get(base, 'user/user.json').then(function(url) {
     this.policy.get(this.caller.lineage, url).then(function(user) {
-      this.core.manager.setup(user);
-      this.core.bindChannel(id, continuation, user);
+      var userdefaultport = new fdom.port.Proxy(fdom.proxy.EventInterface);
+      this.core.manager.setup(userdefaultport);
+      this.core.manager.createLink(userdefaultport, 'default', user);
+      userdefaultport.getInterface().emit('channel', id);
+      continuation();
     }.bind(this));
   }.bind(this));
 };

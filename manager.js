@@ -27,9 +27,16 @@ freedom.on('pool', function(level) {
 
 freedom.on('push', function(n) {
   // Choose a user to make the push.
+  var who = [];
+  for (var i = 0; i < n; i++) {
+    who.push(Math.random());
+  }
+
   var id = Math.random();
   var user = getU(id);
-  user.emit('push', n);
+  if (user) {
+    user.emit('push', who);
+  }
 });
 
 var getU = function(id) {
@@ -37,7 +44,7 @@ var getU = function(id) {
     return users[id];
   } else if (pool.length) {
     users[id] = pool.pop();
-    users[id].emit('id', id);
+    users[id].emit('create', id);
 
     var deficit = poolLevel - (pool.length + poolOutstanding);
     if (deficit > poolLevel / 2) {

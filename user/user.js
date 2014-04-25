@@ -1,12 +1,24 @@
 var social = freedom.social();
 var storage = freedom.storage();
+var core = freedom.core();
 var myId;
 
 var myLog = "";
 
-freedom.on('create', function(id) {
+var manager = null;
+
+freedom.on('channel', function(id) {
+  core.bindChannel(id).then(function(chan) {
+    manager = chan;
+    manager.on('create', create);
+    manager.on('push', push);
+  });
+});
+
+var create = function(id) {
   if (!myId) {
     myId = id;
+    console.log('User created as ' + id);
     social.login({
       agent: myId
     });
@@ -16,14 +28,13 @@ freedom.on('create', function(id) {
   } else {
     console.error('Already a user!');
   }
-});
+};
 
-freedom.on('push', function(ids) {
-  var who = ids.split(",");
-  for (var i = 0; i < who.length; i++) {
-    social.sendMessage(who[i], "Push [" + i + "/" + who.length + "] to " + who[i] );
+var push = function(ids) {
+  for (var i = 0; i < ids.length; i++) {
+    social.sendMessage(ids[i], "Push [" + i + "/" + ids.length + "] to " + ids[i] );
   }
-});
+};
 
 social.on('onMessage', function(msg) {
   var str = JSON.stringify(msg);

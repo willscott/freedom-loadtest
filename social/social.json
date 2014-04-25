@@ -3,6 +3,9 @@
   "app": {
     "script": "social.js"
   },
+  "constraints": {
+    "isolation": "never"
+  },
   "provides": [
     "social"
   ]

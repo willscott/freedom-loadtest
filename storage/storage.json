@@ -3,6 +3,9 @@
   "app": {
     "script": "storage.js"
   },
+  "constraints": {
+    "isolation": "never"
+  },
   "provides": [
     "storage"
   ]

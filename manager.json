@@ -1,0 +1,9 @@
+{
+  "name": "manager",
+  "app": {
+    "script": "manager.js"
+  },
+  "permissions": [
+    "core.echo"
+  ]
+}

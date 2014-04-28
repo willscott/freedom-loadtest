@@ -22,3 +22,12 @@ http.createServer(function(req, resp) {
 }).listen(9876);
 
 exports.manager = manager;
+
+exports.churn = function(often,until) {
+  var interval = setInterval(function() {
+    manager.emit('req');
+  }, often);
+  setTimeout(function() {
+    clearInterval(interval);
+  }, until);
+};

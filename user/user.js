@@ -8,7 +8,6 @@ var myLog = "";
 var manager = null;
 
 freedom.on('channel', function(id) {
-  console.log('SETUPEND: ' + new Date().valueOf());
   core.bindChannel(id).then(function(chan) {
     manager = chan;
     manager.on('create', create);
@@ -17,15 +16,17 @@ freedom.on('channel', function(id) {
 });
 
 var create = function(id) {
+  var ms = process.hrtime()[1] - id;
+  console.log('creation time :' + ms);
   if (!myId) {
     myId = id;
-    console.log('User created as ' + id);
-    social.login({
-      agent: myId
-    });
-    storage.get(myId).then(function(log) {
-      myLog = log;
-    });
+//    console.log('User created as ' + id);
+//    social.login({
+//      agent: myId
+//    });
+//    storage.get(myId).then(function(log) {
+//      myLog = log;
+//    });
   } else {
     console.error('Already a user!');
   }
@@ -33,7 +34,7 @@ var create = function(id) {
 
 var push = function(ids) {
   for (var i = 0; i < ids.length; i++) {
-    social.sendMessage(ids[i], "Push [" + i + "/" + ids.length + "] to " + ids[i] );
+//    social.sendMessage(ids[i], "Push [" + i + "/" + ids.length + "] to " + ids[i] );
   }
 };
 

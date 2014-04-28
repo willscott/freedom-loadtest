@@ -39,11 +39,23 @@ freedom.on('push', function(n) {
   }
 });
 
+freedom.on('req', function() {
+  var user = pool.pop();
+  if (!user) {
+    console.warn('request dropped');
+  } else {
+    user.emit('create', process.hrtime()[1]);
+    refillPool();
+    user.close();
+  }
+});
+
 var getU = function(id) {
   if (users[id]) {
     return users[id];
   } else if (pool.length) {
     users[id] = pool.pop();
+    console.log('CREATE: ' + process.hrtime());
     users[id].emit('create', id);
 
     var deficit = poolLevel - (pool.length + poolOutstanding);

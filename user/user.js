@@ -8,6 +8,7 @@ var myLog = "";
 var manager = null;
 
 freedom.on('channel', function(id) {
+  console.log('SETUPEND: ' + new Date().valueOf());
   core.bindChannel(id).then(function(chan) {
     manager = chan;
     manager.on('create', create);

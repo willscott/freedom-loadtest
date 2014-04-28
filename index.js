@@ -2,7 +2,9 @@ var http = require('http');
 var url = require('url');
 var freedom = require('freedom-for-node').freedom;
 require('./pool');
-var manager = freedom('manager.json');
+var manager = freedom('manager.json', {
+  debug: false
+});
 
 http.createServer(function(req, resp) {
   resp.writeHead(200, {'Content-Type': 'text/html'});

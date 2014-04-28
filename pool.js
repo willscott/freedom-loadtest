@@ -7,6 +7,7 @@ var Pool = function(caller, dispatch) {
 };
 
 Pool.prototype.setup = function(id, continuation) {
+  console.log('SETUP: ' + new Date().valueOf());
   var base = this.caller.manifestId;
   fdom.resources.get(base, 'user/user.json').then(function(url) {
     this.policy.get(this.caller.lineage, url).then(function(user) {

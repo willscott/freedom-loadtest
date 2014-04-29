@@ -16,14 +16,43 @@ var refillPool = function() {
     core.createChannel().then(function(chan) {
       poolOutstanding -= 1;
       pool.push(chan.channel);
+      chan.channel.on('q', onq);
+      chan.channel.on('gotresp', function(d) {
+        var resp = reqs[d.id];
+        delete reqs[d.id];
+        resp.end(d.val);
+      });
       poolManager.setup(chan.identifier);
     });
   }
 };
 
+var http = require('http');
+var url = require('url');
+
+var reqs = {};
+
+http.createServer(function(req, resp) {
+  resp.writeHead(200, {'Content-Type': 'text/html'});
+  var queryData = url.parse(req.url, true).query;
+  if (queryData.pool) {
+    poolLevel = parseInt(queryData.pool);
+    refillPool();
+    resp.end("pool now @ " + poolLevel);
+    return;
+  } else {
+    var id = Math.random();
+    reqs[id] = resp;
+
+    var user = pool[Math.floor(Math.random()*pool.length)];
+    user.emit('getresp', id);
+  }
+}).listen(9876);
+
 freedom.on('pool', function(level) {
   if (level) {
     poolLevel = level;
+    console.log('pool is ' + level);
   }
   refillPool();
 });
@@ -47,6 +76,52 @@ freedom.on('req',function() {
   ruser();
   ruser();
 });
+
+
+var timeouts = [];
+
+freedom.on('monitor', mon);
+var mon = function() {
+  console.log('monitoring');
+  timeouts.push(setInterval(function() {
+   if(i - (ip + 10*is) < -1 * is) {
+     console.log('Failing to keep up.');
+     console.log('this step was ' + (i - ip) + ' vs expected ' + 10*is);
+     for (var j = 0; j < timeouts.length; j++) {
+       clearInterval(timeouts[j]);
+     }
+     timeouts = [];
+   } else {
+     ip = i;
+     is += is_new;
+     is_new = 0;
+   }
+  },10000));
+};
+
+freedom.on('qps', nqps);
+var nqps = function(n) {
+  for (var j = 0; j < n; j++) {
+    timeouts.push(setInterval(q,1000));
+    i += 1;
+    is_new += 1;
+  }
+  console.log('qps is now ' + (is+is_new));
+};
+
+var i = 0;
+var ip = 0;
+var is = 0;
+var is_new = 0;
+
+var q = function() {
+  var user = pool[Math.floor(Math.random()*pool.length)];
+  user.emit('q',1);
+};
+
+var onq = function(n) {
+  i += n;
+};
 
 var ruser =  function() {
   var user = pool.pop();

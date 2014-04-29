@@ -7,11 +7,20 @@ var myLog = "";
 
 var manager = null;
 
+var c = 0;
+
 freedom.on('channel', function(id) {
   core.bindChannel(id).then(function(chan) {
     manager = chan;
     manager.on('create', create);
     manager.on('push', push);
+    manager.on('q', function(n) {
+      //todo: process req.
+      manager.emit('q', n);
+    });
+    manager.on('getresp', function(id) {
+      manager.emit('gotresp', {id: id, val: 'response #' + c++ });
+    });
   });
 });
 

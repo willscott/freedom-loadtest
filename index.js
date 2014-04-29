@@ -5,7 +5,7 @@ require('./pool');
 var manager = freedom('manager.json', {
   debug: false
 });
-
+/*
 http.createServer(function(req, resp) {
   resp.writeHead(200, {'Content-Type': 'text/html'});
   var queryData = url.parse(req.url, true).query;
@@ -20,6 +20,7 @@ http.createServer(function(req, resp) {
     "<form method=get>Pool:<input type=text name=pool value=10></form></html>");
   }
 }).listen(9876);
+*/
 
 exports.manager = manager;
 

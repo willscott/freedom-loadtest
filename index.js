@@ -24,10 +24,12 @@ http.createServer(function(req, resp) {
 exports.manager = manager;
 
 exports.churn = function(often,until) {
+  console.warn('reqs every ' + often + ' until ' + until);
   var interval = setInterval(function() {
     manager.emit('req');
   }, often);
   setTimeout(function() {
+    console.warn('its done');
     clearInterval(interval);
   }, until);
 };

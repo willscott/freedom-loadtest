@@ -16,8 +16,13 @@ freedom.on('channel', function(id) {
 });
 
 var create = function(id) {
-  var ms = process.hrtime()[1] - id;
-  console.log('creation time :' + ms);
+  var now = process.hrtime();
+  var ms = now[1] - id[1];
+  if (now[0] != id[0]) {
+    ms += (now[0] - id[0])*1000000000
+  }
+  console.log(now + '-\t' + ms);
+  process.exit(0);
   if (!myId) {
     myId = id;
 //    console.log('User created as ' + id);

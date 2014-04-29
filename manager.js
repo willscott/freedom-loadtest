@@ -8,6 +8,9 @@ var poolManager = freedom['core.echo']();
 
 var refillPool = function() {
   var deficit = poolLevel - (pool.length + poolOutstanding);
+//  if (deficit < 10) {
+//    return;
+//  }
   for (var i = 0; i < deficit; i++) {
     poolOutstanding += 1;
     core.createChannel().then(function(chan) {
@@ -39,16 +42,21 @@ freedom.on('push', function(n) {
   }
 });
 
-freedom.on('req', function() {
+freedom.on('req',function() {
+  ruser();
+  ruser();
+  ruser();
+});
+
+var ruser =  function() {
   var user = pool.pop();
   if (!user) {
     console.warn('request dropped');
   } else {
-    user.emit('create', process.hrtime()[1]);
+    user.emit('create', process.hrtime());
     refillPool();
-    user.close();
   }
-});
+};
 
 var getU = function(id) {
   if (users[id]) {

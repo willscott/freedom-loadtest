@@ -24,13 +24,23 @@ http.createServer(function(req, resp) {
 
 exports.manager = manager;
 
-exports.churn = function(often,until) {
-  console.warn('reqs every ' + often + ' until ' + until);
+exports.churn = function(often,mult,until) {
   var interval = setInterval(function() {
-    manager.emit('req');
+    manager.emit('req', mult);
   }, often);
   setTimeout(function() {
     console.warn('its done');
     clearInterval(interval);
   }, until);
+};
+
+exports.sampleChurn = function(pool,rate) {
+  m.manager.emit('pool', pool);
+  var mult = Math.ceil(100/rate);
+  if (mult > 1) {
+    rate /= mult;
+  }
+  setTimeout(function() {
+    exports.churn(rate, mult, 10000);
+  }, 2000);
 };

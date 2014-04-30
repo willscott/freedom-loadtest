@@ -73,10 +73,10 @@ freedom.on('push', function(n) {
   }
 });
 
-freedom.on('req',function() {
-  ruser();
-  ruser();
-  ruser();
+freedom.on('req',function(n) {
+  for (var i = 0; i < n; i++) {
+    ruser();
+  }
 });
 
 

@@ -92,6 +92,8 @@ var mon = function() {
        clearInterval(timeouts[j]);
      }
      timeouts = [];
+     freedom.emit('over', is);
+     i = ip = is = is_new = 0;
    } else {
      ip = i;
      is += is_new;

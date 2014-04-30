@@ -53,6 +53,7 @@ exports.sampleQPS = function(pool) {
   var istep = 100;
   var iint = 1000;
   m.manager.on('over', function(n) {
+    m.manager.emit('monitor');
     clearInterval(run);
     lb += (n - lb)/2;
     istep / 2;

@@ -44,3 +44,30 @@ exports.sampleChurn = function(pool,rate) {
     exports.churn(rate, mult, 10000);
   }, 2000);
 };
+
+exports.sampleQPS = function(pool) {
+  m.manager.emit('pool', pool);
+  m.manager.emit('monitor');
+  var run;
+  var lb = 0;
+  var istep = 100;
+  var iint = 1000;
+  m.manager.on('over', function(n) {
+    clearInterval(run);
+    lb += (n - lb)/2;
+    istep / 2;
+    if (istep < 20) {
+      iint *= 2;
+    }
+    setTimeout(function() {
+      m.manager.emit('qps', lb);
+      doRun(istep, iint);
+    }, 2000);
+  });
+  var doRun = function(step, often) {
+    run = setInterval(m.manager.emit.bind(m.manager, 'qps', step), often);
+  }
+  setTimeout(function() {
+    doRun(istep, 1000);
+  }, 2000);
+};

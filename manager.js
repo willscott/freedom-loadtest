@@ -32,6 +32,7 @@ var url = require('url');
 
 var reqs = {};
 
+freedom.on('web', function() {
 http.createServer(function(req, resp) {
   resp.writeHead(200, {'Content-Type': 'text/html'});
   var queryData = url.parse(req.url, true).query;
@@ -48,6 +49,7 @@ http.createServer(function(req, resp) {
     user.emit('getresp', id);
   }
 }).listen(9876);
+});
 
 freedom.on('pool', function(level) {
   if (level) {
@@ -80,7 +82,6 @@ freedom.on('req',function() {
 
 var timeouts = [];
 
-freedom.on('monitor', mon);
 var mon = function() {
   console.log('monitoring');
   timeouts.push(setInterval(function() {
@@ -98,9 +99,14 @@ var mon = function() {
    }
   },10000));
 };
+freedom.on('monitor', mon);
 
-freedom.on('qps', nqps);
 var nqps = function(n) {
+  if (n > 10) {
+    var x = n - 10;
+    n = 10;
+    setTimeout(nqps.bind({}, x), 10);
+  }
   for (var j = 0; j < n; j++) {
     timeouts.push(setInterval(q,1000));
     i += 1;
@@ -108,6 +114,7 @@ var nqps = function(n) {
   }
   console.log('qps is now ' + (is+is_new));
 };
+freedom.on('qps', nqps);
 
 var i = 0;
 var ip = 0;

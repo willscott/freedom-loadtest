@@ -30,7 +30,8 @@ var create = function(id) {
   if (now[0] != id[0]) {
     ms += (now[0] - id[0])*1000000000
   }
-  console.log(now + '-\t' + ms);
+  //console.log(now + '-\t' + ms);
+  console.log(ms);
   process.exit(0);
   if (!myId) {
     myId = id;

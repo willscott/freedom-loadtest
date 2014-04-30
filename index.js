@@ -34,12 +34,12 @@ exports.churn = function(often,mult,until) {
   }, until);
 };
 
-exports.sampleChurn = function(pool,rate) {
+exports.sampleChurn = function(pool,rate,mult) {
   m.manager.emit('pool', pool);
-  var mult = Math.ceil(100/rate);
-  if (mult > 1) {
-    rate /= mult;
-  }
+  //var mult = Math.ceil(100/rate);
+  //if (mult > 1) {
+  //  rate /= mult;
+  //}
   setTimeout(function() {
     exports.churn(rate, mult, 10000);
   }, 2000);

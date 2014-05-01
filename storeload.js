@@ -35,7 +35,7 @@ var pnext = function(coll) {
   })
 }
 
-MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
+MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
   if (err) throw err;
   var collection = db.collection('test_insert');
   pnext(collection);
@@ -77,7 +77,7 @@ exports.doTest = function(verify) {
     thisqs.push(q);
   });
 
-  MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
+  MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
     var collection = db.collection('test_insert');
     teststart = process.hrtime();
 
@@ -99,9 +99,9 @@ exports.doTest = function(verify) {
 var stats = function(start,end) {
   teststart = 0;
   if (start == 0) return;
-  var total = end[1] - start[1] + (end[0] - start[0]) * 1000000000;
+  var total = (end[1] - start[1])/1000000 + (end[0] - start[0]) * 1000;
 
-  console.log('q time: ' + (total/n/1000000) + 'ms');
+  console.log('thruput: ' + ((n/total)*1000) + 'ops/ms');
   testend();
 }
 

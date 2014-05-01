@@ -2,6 +2,7 @@ var signer = require('./signs');
 var zipff = require('./zipfian').ZipfianGenerator;
 var zipf = new zipff(1000);
 var MongoClient = require('mongodb').MongoClient;
+var q=  require('q');
 
 var n = 10000;
 
@@ -68,6 +69,7 @@ var fnext = function(qq,coll) {
   });
 };
 var teststart;
+var testend;
 
 exports.doTest = function(verify) {
   var thisqs = [];
@@ -89,15 +91,17 @@ exports.doTest = function(verify) {
       }
     }
   });
+  return q.Promise(function(resolve,reject) {
+    testend = resolve;
+  });
 }
 
 var stats = function(start,end) {
   teststart = 0;
   if (start == 0) return;
-  console.log(start);
-  console.log(end);
   var total = end[1] - start[1] + (end[0] - start[0]) * 1000000000;
 
   console.log('q time: ' + (total/n/1000000) + 'ms');
+  testend();
 }
 

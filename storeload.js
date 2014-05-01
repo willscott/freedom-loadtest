@@ -1,23 +1,68 @@
 var signer = require('./signs');
+var zipf = new require('./zipfian').ZipfianGenerator(1000);
+var mongo = require('mongodb').MongoClient;
 
-var n = 1000;
+var n = 100000;
 
-var msgs = [];
+var qs = [];
+var ms = [];
 for (var i = 0; i < n; i++) {
-  var m = 'this is message ' + i;
-  msgs.push(signer.sm(m));
+  var key = Math.floor(zipf.next(1000));
+  qs.push(key);
+}
+for (var i = 0; i < 1000; i++) {
+  var m = 'this is message ' + key + ': ' + i;
+  while(m.length < 1024) {
+    m += 'x';
+  }
+  msgs.push([ms, signer.sm(m)]);
 };
+console.log('msgs ready to go');
 
-var responses = [];
+MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
+  if (err) throw err;
+  var collection = db.collection('test_insert');
+  for(var i = 0; i < ms.length; i++) {
+    collection.insert({'key': ms[i][0], 'val': ms[i][1]});
+  }
+  console.log('inserts made');
+});
 
-var start = process.hrtime();
+exports.doTest = function(verify) {
+  MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
+    var collection = db.collection('test_insert');
+    var start = process.hrtime(), end;
 
-for (var i = 0; i < msgs.length; i++) {
-  responses.push(signer.vm(msgs[i]));
+    var os = qs.length;
+    if (verify) {
+    for (var i = 0; i < qs.length; i++) {
+      collection.find({'key': qs[i]}).nextObject(function(err,doc) {
+        signer.vm(doc['val']);
+        os--;
+        if (os == 0) {
+          end = process.hrtime();
+          stats(start,end);
+        }
+      });
+    }
+  } else {
+    for (var i = 0; i < qs.length; i++) {
+      collection.find({'key': qs[i]}).nextObject(function(err,doc) {
+        os--;
+        if (os == 0) {
+          end = process.hrtime();
+          stats(start,end);
+        }
+      });
+    }
+  }
+  });
 }
 
-var end = process.hrtime();
+var stats = function(start,end) {
+  var total = end[1] - start[1] + (end[0] - start[0] * 1000000000);
 
-var total = end[1] - start[1] + (end[0] - start[0] * 1000000000);
+  console.log('q time: ' + (total/n/1000000) + 'ms');    
+}
 
-console.log('verification imposed ' + (total/n/1000000) + 'ms');
+

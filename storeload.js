@@ -32,7 +32,7 @@ var pnext = function(coll) {
     } else {
       console.log('inserts made');
     }
-  })
+  });
 }
 
 MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
@@ -43,9 +43,12 @@ MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
 
 var fnextV = function(qq,coll) {
   var mq = qq.pop();
-  coll.find({'key': mq}).nextObject(function(err,doc) {
+  var ts = process.hrtime();
+  coll.find({'key': mq}).nextObject(function(s,err,doc) {
     if (err) throw err;
     signer.vm(doc['val']);
+    var e = process.hrtime();
+    latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {
       process.nextTick(function() {
         fnextV(qq, coll)
@@ -53,23 +56,30 @@ var fnextV = function(qq,coll) {
     } else {
       stats(teststart, process.hrtime());
     }
-  });
+  }.bind({},ts));
 };
-var fnext = function(qq,coll) {
+
+var fnextV = function(qq,coll) {
   var mq = qq.pop();
-  coll.find({'key': mq}).nextObject(function(err,doc) {
+  var ts = process.hrtime();
+  coll.find({'key': mq}).nextObject(function(s,err,doc) {
     if (err) throw err;
+    var e = process.hrtime();
+    latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {
       process.nextTick(function() {
-        fnext(qq, coll)
+        fnextV(qq, coll)
       });
     } else {
       stats(teststart, process.hrtime());
     }
-  });
+  }.bind({},ts));
 };
+
+
 var teststart;
 var testend;
+var latencies = [];
 
 exports.doTest = function(verify) {
   var thisqs = [];
@@ -99,9 +109,16 @@ exports.doTest = function(verify) {
 var stats = function(start,end) {
   teststart = 0;
   if (start == 0) return;
-  var total = (end[1] - start[1])/1000000 + (end[0] - start[0]) * 1000;
+  var totalL = 0;
+  latencies.forEach(function(l) {
+    totalL += l;
+  });
+  totalL /= latencies.length;
+  latencies = [];
+  var total = (end[1] - start[1])/1000000000 + (end[0] - start[0]);
 
-  console.log('thruput: ' + ((n/total)*1000) + 'ops/ms');
+  console.log(n/total + '\t' + toalL);
+
   testend();
 }
 

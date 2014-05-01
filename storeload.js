@@ -1,6 +1,7 @@
 var signer = require('./signs');
-var zipf = new require('./zipfian').ZipfianGenerator(1000);
-var mongo = require('mongodb').MongoClient;
+var zipff = require('./zipfian').ZipfianGenerator;
+var zipf = new zipff(1000);
+var MongoClient = require('mongodb').MongoClient;
 
 var n = 100000;
 
@@ -15,17 +16,22 @@ for (var i = 0; i < 1000; i++) {
   while(m.length < 1024) {
     m += 'x';
   }
-  msgs.push([ms, signer.sm(m)]);
+  ms.push([ms, signer.sm(m)]);
 };
 console.log('msgs ready to go');
 
 MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
   if (err) throw err;
   var collection = db.collection('test_insert');
+  var todo = ms.length;
   for(var i = 0; i < ms.length; i++) {
-    collection.insert({'key': ms[i][0], 'val': ms[i][1]});
-  }
+    collection.insert({'key': ms[i][0], 'val': ms[i][1]}, function() {
+      todo -= 1;
+if (todo == 0) {
   console.log('inserts made');
+}
+    });
+  }
 });
 
 exports.doTest = function(verify) {

@@ -20,51 +20,74 @@ for (var i = 0; i < 1000; i++) {
 };
 console.log('msgs ready to go');
 
+var pnext = function(coll) {
+  var nex = ms.pop();
+  coll.insert({'key', nex[0], 'val': nex[1]}, function(e) {
+    if (e) throw e;
+    if (ms.length) {
+      process.nextTick(function() {
+        pnext(coll)
+      });
+    } else {
+      console.log('inserts made');
+    }
+  })
+}
+
 MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
   if (err) throw err;
   var collection = db.collection('test_insert');
-  var todo = ms.length;
-  for(var i = 0; i < ms.length; i++) {
-    collection.insert({'key': ms[i][0], 'val': ms[i][1]}, function(e) {
-      if (e) throw e;
-      todo -= 1;
-if (todo == 0) {
-  console.log('inserts made');
-}
-    });
-  }
+  pnext(collection);
 });
 
+var fnextV = function(qq,coll) {
+  var mq = qq.pop();
+  coll.find({'key': mq}).nextObject(function(err,doc) {
+    if (err) throw err;
+    signer.vm(doc['val']);
+    if (qq.length) {
+      process.nextTick(function() {
+        fnextV(qq, coll)
+      });
+    } else {
+      stats(teststart, process.hrtime());
+    }
+  });
+};
+var fnext = function(qq,coll) {
+  var mq = qq.pop();
+  coll.find({'key': mq}).nextObject(function(err,doc) {
+    if (err) throw err;
+    if (qq.length) {
+      process.nextTick(function() {
+        fnext(qq, coll)
+      });
+    } else {
+      stats(teststart, process.hrtime());
+    }
+  });
+};
+var teststart;
+
 exports.doTest = function(verify) {
+  var thisqs = [];
+  qs.forEach(function(q) {
+    thisqs.push(q);
+  });
+
   MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(err, db) {
     var collection = db.collection('test_insert');
-    var start = process.hrtime(), end;
+    teststart = process.hrtime();
 
-    var os = qs.length;
     if (verify) {
-    for (var i = 0; i < qs.length; i++) {
-      collection.find({'key': qs[i]}).nextObject(function(err,doc) {
-        if (err) throw err;
-        signer.vm(doc['val']);
-        os--;
-        if (os == 0) {
-          end = process.hrtime();
-          stats(start,end);
-        }
-      });
+      for (var i = 0; i < 10; i++) {
+        fnextV(thisqs, collection);
+      }
+    } else {
+      for (var i = 0; i < 10; i++) {
+        fnext(thisqs, collection);
+      }
     }
-  } else {
-    for (var i = 0; i < qs.length; i++) {
-      collection.find({'key': qs[i]}).nextObject(function(err,doc) {
-        if (err) throw err;
-        os--;
-        if (os == 0) {
-          end = process.hrtime();
-          stats(start,end);
-        }
-      });
-    }
-  }
   });
 }
 

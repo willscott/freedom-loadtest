@@ -9,20 +9,37 @@ var manager = null;
 
 var c = 0;
 
+var samples = [];
+
 freedom.on('channel', function(id) {
   core.bindChannel(id).then(function(chan) {
     manager = chan;
     manager.on('create', create);
     manager.on('push', push);
     manager.on('q', function(n) {
-      //todo: process req.
-      manager.emit('q', n);
+      var now = process.hrtime();
+      var ms = now[1] - n[1];
+  if (now[0] != n[0]) {
+    ms += (now[0] - n[0])*1000000000
+  }
+      samples.push(ms);
+      if (samples.length > 100) {
+        var e = 0;
+        for (var i = 0; i < samples.length; i++) {
+          e += samples[i];
+        }
+        console.log('user average: ' + e/100);
+        samples = [];
+      }
+//      manager.emit('q', n);
     });
     manager.on('getresp', function(id) {
       manager.emit('gotresp', {id: id, val: 'response #' + c++ });
     });
   });
 });
+
+
 
 var create = function(id) {
   var now = process.hrtime();

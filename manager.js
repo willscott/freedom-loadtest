@@ -125,7 +125,7 @@ var is_new = 0;
 
 var q = function() {
   var user = pool[Math.floor(Math.random()*pool.length)];
-  user.emit('q',1);
+  user.emit('q',process.hrtime());
 };
 
 var onq = function(n) {

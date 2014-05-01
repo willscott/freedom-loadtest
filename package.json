@@ -19,6 +19,9 @@
   "scripts": {},
   "dependencies": {
     "freedom-for-node": "~0.0.3",
-    "nedb": "~0.10.5"
+    "nedb": "~0.10.5",
+    "q": "~1.0.1",
+    "ursa": "~0.8.0",
+    "mongodb": "~1.4.3"
   }
 }

@@ -9,14 +9,14 @@ pubk = k.toPublicPem().toString('utf8');
 exports.sm = function(msg) {
   var sign = crypto.createSign('sha1');
   sign.update(msg);
-  var sig = sign.sign(prik);  
+  var sig = sign.sign(prik,'hex');  
   return [msg, sig];
 };
 
 exports.vm = function(msg) {
   var verify = crypto.createVerify('sha1');
   verify.update(msg[0]);
-  if (verify.verify(pubk, msg[1])) {
+  if (verify.verify(pubk, msg[1],'hex')) {
     return msg[0];
   } else {
     return null;

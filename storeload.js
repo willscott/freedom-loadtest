@@ -3,7 +3,7 @@ var zipff = require('./zipfian').ZipfianGenerator;
 var zipf = new zipff(1000);
 var MongoClient = require('mongodb').MongoClient;
 
-var n = 100000;
+var n = 10000;
 
 var qs = [];
 var ms = [];
@@ -22,7 +22,7 @@ console.log('msgs ready to go');
 
 var pnext = function(coll) {
   var nex = ms.pop();
-  coll.insert({'key': nex[0], 'val': nex[1][0], 's': }, function(e) {
+  coll.insert({'key': nex[0], 'val': nex[1]}, function(e) {
     if (e) throw e;
     if (ms.length) {
       process.nextTick(function() {

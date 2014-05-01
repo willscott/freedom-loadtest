@@ -25,7 +25,8 @@ MongoClient.connect('mongodb://mariner.cs.washington.edu:27017/test', function(e
   var collection = db.collection('test_insert');
   var todo = ms.length;
   for(var i = 0; i < ms.length; i++) {
-    collection.insert({'key': ms[i][0], 'val': ms[i][1]}, function() {
+    collection.insert({'key': ms[i][0], 'val': ms[i][1]}, function(e) {
+      if (e) throw e;
       todo -= 1;
 if (todo == 0) {
   console.log('inserts made');
@@ -43,6 +44,7 @@ exports.doTest = function(verify) {
     if (verify) {
     for (var i = 0; i < qs.length; i++) {
       collection.find({'key': qs[i]}).nextObject(function(err,doc) {
+        if (err) throw err;
         signer.vm(doc['val']);
         os--;
         if (os == 0) {
@@ -54,6 +56,7 @@ exports.doTest = function(verify) {
   } else {
     for (var i = 0; i < qs.length; i++) {
       collection.find({'key': qs[i]}).nextObject(function(err,doc) {
+        if (err) throw err;
         os--;
         if (os == 0) {
           end = process.hrtime();
@@ -66,6 +69,8 @@ exports.doTest = function(verify) {
 }
 
 var stats = function(start,end) {
+  console.log(start);
+  console.log(end);
   var total = end[1] - start[1] + (end[0] - start[0] * 1000000000);
 
   console.log('q time: ' + (total/n/1000000) + 'ms');    

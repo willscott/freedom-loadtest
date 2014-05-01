@@ -16,13 +16,13 @@ for (var i = 0; i < 1000; i++) {
   while(m.length < 1024) {
     m += 'x';
   }
-  ms.push([ms, signer.sm(m)]);
+  ms.push([i, signer.sm(m)]);
 };
 console.log('msgs ready to go');
 
 var pnext = function(coll) {
   var nex = ms.pop();
-  coll.insert({'key', nex[0], 'val': nex[1]}, function(e) {
+  coll.insert({'key': nex[0], 'val': nex[1][0], 's': }, function(e) {
     if (e) throw e;
     if (ms.length) {
       process.nextTick(function() {

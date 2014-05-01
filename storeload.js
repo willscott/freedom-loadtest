@@ -92,10 +92,12 @@ exports.doTest = function(verify) {
 }
 
 var stats = function(start,end) {
+  teststart = 0;
+  if (start == 0) return;
   console.log(start);
   console.log(end);
-  var total = end[1] - start[1] + (end[0] - start[0] * 1000000000);
+  var total = end[1] - start[1] + (end[0] - start[0]) * 1000000000;
 
-  console.log('q time: ' + (total/n/1000000) + 'ms');    
+  console.log('q time: ' + (total/n/1000000) + 'ms');
 }
 

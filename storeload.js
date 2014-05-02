@@ -22,7 +22,7 @@ var pnext = function(coll) {
   var nex = ms.pop();
   var val = nex[2];
   while(val.length < 1024) {
-    val += 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+    val += 'x';
   }
   coll.insert({'key': nex[0], 'val': nex[2], 'sig':nex[1]}, function(e) {
     if (e) throw e;
@@ -47,7 +47,7 @@ var fnextV = function(qq,d,coll) {
   var ts = process.hrtime();
   coll.find({'key': mq}).nextObject(function(s,err,doc) {
     if (err) throw err;
-    if (doc) signer.vm(doc['sig']);
+    if (doc && (Math.random() > -1)) signer.vm(doc['sig']);
     var e = process.hrtime();
     latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {

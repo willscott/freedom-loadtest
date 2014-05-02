@@ -83,6 +83,7 @@ var latencies = [];
 
 exports.doTest = function(verify, plel,delay) {
   if(!plel) {plel = 10;}
+  if(!delay) {delay = 0;}
   var thisqs = [];
   qs.forEach(function(q) {
     thisqs.push(q);

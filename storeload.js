@@ -14,16 +14,17 @@ for (var i = 0; i < n; i++) {
 }
 for (var i = 0; i < 1000; i++) {
   var m = 'this is message ' + key + ': ' + i;
-  while(m.length < 1024) {
-    m += 'x';
-  }
-  ms.push([i, signer.sm(m)]);
+  ms.push([i, signer.sm('k'+i), m]);
 };
 console.log('msgs ready to go');
 
 var pnext = function(coll) {
   var nex = ms.pop();
-  coll.insert({'key': nex[0], 'val': nex[1]}, function(e) {
+  var val = nex[2];
+  while(val.length < 1024) {
+    val += 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+  }
+  coll.insert({'key': nex[0], 'val': nex[2], 'sig':nex[1]}, function(e) {
     if (e) throw e;
     if (ms.length) {
       process.nextTick(function() {
@@ -46,7 +47,7 @@ var fnextV = function(qq,d,coll) {
   var ts = process.hrtime();
   coll.find({'key': mq}).nextObject(function(s,err,doc) {
     if (err) throw err;
-    if (doc) signer.vm(doc['val']);
+    if (doc) signer.vm(doc['sig']);
     var e = process.hrtime();
     latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {

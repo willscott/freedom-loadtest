@@ -46,7 +46,7 @@ var fnextV = function(qq,coll) {
   var ts = process.hrtime();
   coll.find({'key': mq}).nextObject(function(s,err,doc) {
     if (err) throw err;
-    signer.vm(doc['val']);
+    if (doc) signer.vm(doc['val']);
     var e = process.hrtime();
     latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {

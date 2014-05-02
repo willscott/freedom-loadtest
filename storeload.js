@@ -41,7 +41,7 @@ MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
   collection.remove({}, pnext.bind({}, collection));
 });
 
-var fnextV = function(qq,coll) {
+var fnextV = function(qq,d,coll) {
   var mq = qq.pop();
   var ts = process.hrtime();
   coll.find({'key': mq}).nextObject(function(s,err,doc) {
@@ -50,16 +50,16 @@ var fnextV = function(qq,coll) {
     var e = process.hrtime();
     latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {
-      process.nextTick(function() {
-        fnextV(qq, coll)
-      });
+      setTimeout(function() {
+        fnextV(qq, d,coll)
+      },d);
     } else {
       stats(teststart, process.hrtime());
     }
   }.bind({},ts));
 };
 
-var fnext = function(qq,coll) {
+var fnext = function(qq,d,coll) {
   var mq = qq.pop();
   var ts = process.hrtime();
   coll.find({'key': mq}).nextObject(function(s,err,doc) {
@@ -67,9 +67,9 @@ var fnext = function(qq,coll) {
     var e = process.hrtime();
     latencies.push((e[1] - s[1])/1000000000 + (e[0] - s[0]));
     if (qq.length) {
-      process.nextTick(function() {
-        fnext(qq, coll)
-      });
+      setTimeout(function() {
+        fnext(qq,d, coll)
+      },d);
     } else {
       stats(teststart, process.hrtime());
     }
@@ -81,7 +81,7 @@ var teststart;
 var testend;
 var latencies = [];
 
-exports.doTest = function(verify, plel) {
+exports.doTest = function(verify, plel,delay) {
   if(!plel) {plel = 10;}
   var thisqs = [];
   qs.forEach(function(q) {
@@ -94,11 +94,11 @@ exports.doTest = function(verify, plel) {
 
     if (verify) {
       for (var i = 0; i < plel; i++) {
-        fnextV(thisqs, collection);
+        fnextV(thisqs, delay,collection);
       }
     } else {
       for (var i = 0; i < plel; i++) {
-        fnext(thisqs, collection);
+        fnext(thisqs, delay,collection);
       }
     }
   });
